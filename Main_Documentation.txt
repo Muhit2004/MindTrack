@@ -1,0 +1,679 @@
+Main.java — Line-by-line documentation and system flow report
+
+Overview
+- Purpose: Console-based Personal Mental Wellness Tracker (MindTrack) main entrypoint. Manages a single session User, reads input, routes to features (activities, mood/stress, goals, progress, reports, and a small innovative feature).
+- Core objects referenced:
+  - User: Holds user profile, activities, mood/stress entries, and wellness goals. Acts as in-memory data store for the session.
+  - WellnessActivity (abstract/base): Base for concrete activities Sleep, Meditation, Journaling, ScreenTime. Each activity carries date, duration, notes and additional fields.
+  - Sleep/Meditation/Journaling/ScreenTime: Concrete activity types with their own fields, validation, and progress/score formatting via getProgress()/toString().
+  - MoodStressEntry: Represents a mood/stress log with tags/triggers/notes and a computed wellness score.
+  - WellnessGoal: Represents a user goal with type (from GoalType strings), target value, date range, description and simple progress.
+  - GoalType: Provides known goal type labels and simple validation helper.
+- Storage model: All data is kept in memory within the static User currentUser; nothing is written to disk. Data persists only for the duration of the program run.
+- Input/Output model: System.in via a single static Scanner; output via System.out.
+
+Line-by-line
+1: /* — Begin file header comment block. Explains that the template was replaced by a full console app and what features were implemented.
+2-5: Continuation of the multi-line comment with additional context, including constraints (no HashMap/enum at certain places) and note tags.
+6: */ — End of file header comment.
+7: Blank line for readability.
+8: import java.time.LocalDate; — Brings LocalDate into scope for date handling.
+9: import java.time.LocalTime; — Brings LocalTime into scope for time handling.
+10: import java.util.Scanner; — Brings Scanner into scope for reading console input.
+11: Blank line for readability.
+12: public class Main { — Main application class that contains the entry point and all menu handlers and helpers.
+13: private static User currentUser; — Session-scoped User instance; all data is stored here in-memory for the session.
+14: private static final Scanner scanner = new Scanner(System.in); — Single Scanner for all console input prompts.
+15: Blank line for readability.
+16: public static void main(String[] args) { — Program entry point (JVM calls this first).
+17: // Initialize user once for the session. — Comment describing the session initialization.
+18: System.out.println("Welcome to MindTrack!\n"); — Prints welcome banner.
+19: System.out.print("Please enter your name to begin: "); — Prompts user name.
+20: String name = scanner.nextLine().trim(); — Reads the typed name (may be empty) and trims whitespace.
+21: if (name.isEmpty()) name = "Guest"; — Fallback default name if user entered nothing.
+22: currentUser = new User(name); — Creates a new User object with the chosen name and stores it in static field currentUser.
+23: System.out.println("Hello, " + currentUser.getName() + "! Let's take care of your wellness.\n"); — Greets the user by name.
+24: Blank line for readability.
+25: boolean running = true; — Loop flag to keep showing the main menu until the user exits.
+26: while (running) { — Main application loop.
+27: displayMainMenu(); — Prints the main menu header and all options 1–8.
+28: int choice = readInt("Choose an option (1-8): ", 1, 8); — Reads a validated menu choice (int) within [1,8].
+29: switch (choice) { — Dispatches to the selected feature.
+30: case 1: — Option 1 selected.
+31: logNewActivity(); — Opens the "Log New Activity" flow (sub-menu for activity types and inputs).
+32: break; — Return to main loop after finishing option 1.
+33: case 2: — Option 2 selected.
+34: updateActivity(); — Opens the "Update Activity" flow for editing an existing item.
+35: break; — Return to main loop after finishing option 2.
+36: case 3: — Option 3 selected.
+37: logMoodStress(); — Opens the mood/stress logging flow.
+38: break; — Return to main loop after finishing option 3.
+39: case 4: — Option 4 selected.
+40: setUpdateWellnessGoals(); — Opens goal add/update flow.
+41: break; — Return to main loop after finishing option 4.
+42: case 5: — Option 5 selected.
+43: viewWellnessProgress(); — Shows a snapshot of user, recent activities, recent mood/stress entries, and goals.
+44: break; — Return to main loop after finishing option 5.
+45: case 6: — Option 6 selected.
+46: generateWellnessReports(); — Prints simple categorized summaries of activities and entries.
+47: break; — Return to main loop after finishing option 6.
+48: case 7: — Option 7 selected.
+49: innovativeFeature(); — Shows a simple breathing coach message.
+50: break; — Return to main loop after finishing option 7.
+51: case 8: — Option 8 selected.
+52: System.out.println("Thank you for using MindTrack. Stay healthy and mindful!"); — Exit message.
+53: running = false; — Sets loop flag to false to stop the program.
+54: break; — Breaks out of switch; loop will end.
+55: default: — Should not be reached because readInt validates input.
+56: System.out.println("Invalid choice. Try again."); — Defensive message for unexpected values.
+57: } — End switch.
+58: System.out.println(); — Prints a blank line between iterations for spacing.
+59: } — End while loop.
+60: } — End of main method.
+61: Blank line for readability.
+62: // Main menu display — matches required order. — Comment.
+63: private static void displayMainMenu() { — Prints the static menu header and options.
+64: System.out.println("------------------------------------------------------------"); — Divider line.
+65: System.out.println("Personal Mental Wellness Tracker System (MindTrack)"); — Title line.
+66: System.out.println("User: " + currentUser.getName() + " | Joined: " + currentUser.getJoinDate()); — Shows the currentUser name and join date.
+67: System.out.println("------------------------------------------------------------"); — Divider line.
+68: System.out.println("1. Log New Activity"); — Menu option 1 label.
+69: System.out.println("2. Update Activity"); — Menu option 2 label.
+70: System.out.println("3. Log Mood/Stress"); — Menu option 3 label.
+71: System.out.println("4. Set/Update Wellness Goals"); — Menu option 4 label.
+72: System.out.println("5. View Wellness Progress"); — Menu option 5 label.
+73: System.out.println("6. Generate Wellness Reports"); — Menu option 6 label.
+74: System.out.println("7. [Your innovative feature]"); — Menu option 7 label.
+75: System.out.println("8. Exit"); — Menu option 8 label.
+76: System.out.println("------------------------------------------------------------"); — Divider line.
+77: } — End displayMainMenu.
+78: Blank line.
+79: // Option 1: Log New Activity — includes submenu for activity types. — Comment.
+80: private static void logNewActivity() { — Starts the flow for creating a new activity.
+81: System.out.println("-- Log New Activity --"); — Section header.
+82: System.out.println("Select activity type:"); — Prints activity type sub-menu header.
+83: System.out.println("  1. Sleep"); — Sub-option 1.
+84: System.out.println("  2. Meditation"); — Sub-option 2.
+85: System.out.println("  3. Journaling"); — Sub-option 3.
+86: System.out.println("  4. ScreenTime"); — Sub-option 4.
+87: int type = readInt("Your choice (1-4): ", 1, 4); — Reads an int in [1,4] for activity type.
+88: Blank line not printed; continues.
+89: LocalDate date = readDate("Enter date (YYYY-MM-DD), blank for today: "); — Reads a LocalDate, defaults to today on blank.
+90: String notes = readLine("Any notes (optional): "); — Reads a notes string (can be empty).
+91: Blank line not printed; continues.
+92: try { — Wrap creation and validation in try/catch to show friendly errors.
+93: switch (type) { — Branch by selected activity type.
+94: case 1: — Sleep activity.
+95: double sleepMinutes = readHourAsMinutes("Duration in Hours (0-24): ", 0, 1440); — Reads hours, converts to minutes, validates range.
+96: int quality = readInt("Sleep quality (1-10): ", 1, 10); — Quality score.
+97: LocalTime bedtime = readTime("Bedtime (HH:MM), blank to skip: ", true); — Optional bedtime time (null if blank).
+98: LocalTime wake = readTime("Wake time (HH:MM), blank to skip: ", true); — Optional wake time (null if blank).
+99: boolean nightmares = readYesNo("Had nightmares? (y/n): "); — Yes/No input.
+100: Sleep sleep = new Sleep(date, sleepMinutes, notes, quality, bedtime, wake, nightmares); — Construct Sleep object.
+101: if (!sleep.isValidDuration(sleepMinutes)) { — Validate duration according to Sleep rules.
+102: throw new InvalidActivityDurationException("Invalid duration for Sleep: " + sleepMinutes); — Provide friendly specific error.
+103: } — End invalid branch.
+104: currentUser.addActivity(sleep); — Store the new activity in currentUser's in-memory list.
+105: System.out.println("Added: " + sleep); — Show summary via Sleep.toString().
+106: System.out.println(sleep.getProgress()); — Show progress/score string.
+107: break; — End case 1.
+108: case 2: — Meditation activity.
+109: double medMinutes = readHourAsMinutes("Duration in Hours (0-3): ", 0, 180); — Hours to minutes for meditation with cap.
+110: String medType = readLine("Meditation type (guided/unguided/breathing/etc.): "); — Free text type.
+111: String focus = readLine("Focus area (stress/anxiety/focus/general/etc.): "); — Free text focus area.
+112: int distractions = readInt("Distraction count (0+): ", 0, Integer.MAX_VALUE); — Non-negative count.
+113: boolean completed = readYesNo("Completed session? (y/n): "); — Yes/No.
+114: Meditation meditation = new Meditation(date, medMinutes, notes, medType, focus, distractions, completed); — Construct Meditation object.
+115: if (!meditation.isValidDuration(medMinutes)) { — Validate duration.
+116: throw new InvalidActivityDurationException("Invalid duration for Meditation: " + medMinutes); — Error path.
+117: }
+118: currentUser.addActivity(meditation); — Store in user's activities.
+119: System.out.println("Added: " + meditation); — Print summary.
+120: System.out.println(meditation.getProgress()); — Print computed progress/score.
+121: break; — End case 2.
+122: case 3: — Journaling activity.
+123: double jrnlMinutes = readHourAsMinutes("Duration in Hours (0-2): ", 0, 120); — Hours to minutes validation for journaling.
+124: int moodBefore = readInt("Mood before (1-10): ", 1, 10); — Mood before writing.
+125: int moodAfter = readInt("Mood after (1-10): ", 1, 10); — Mood after writing.
+126: int words = readInt("Approx. word count (0+): ", 0, Integer.MAX_VALUE); — Words count.
+127: String theme = readLine("Journal theme (gratitude/reflection/goals/free-writing/etc.): "); — Free text theme.
+128: boolean beneficial = readYesNo("Felt beneficial? (y/n): "); — Yes/No.
+129: Journaling journaling = new Journaling(date, jrnlMinutes, notes, moodBefore, moodAfter, words, theme, beneficial); — Construct Journaling object.
+130: if (!journaling.isValidDuration(jrnlMinutes)) { — Validate duration.
+131: throw new InvalidActivityDurationException("Invalid duration for Journaling: " + jrnlMinutes); — Error path.
+132: }
+133: currentUser.addActivity(journaling); — Store in user's activities.
+134: System.out.println("Added: " + journaling); — Print summary.
+135: System.out.println(journaling.getProgress()); — Print progress/score.
+136: break; — End case 3.
+137: case 4: — ScreenTime activity.
+138: double stMinutes = readHourAsMinutes("Duration in Hours (0-24): ", 0, 1440); — Hours to minutes validation for screen time.
+139: String device = readLine("Device type (phone/computer/tablet/tv/etc.): "); — Device text.
+140: String purpose = readLine("Purpose (work/education/entertainment/social/etc.): "); — Purpose text.
+141: int breaks = readInt("Breaks taken (0+): ", 0, Integer.MAX_VALUE); — Non-negative break count.
+142: boolean eyeStrain = readYesNo("Caused eye strain? (y/n): "); — Yes/No.
+143: ScreenTime screenTime = new ScreenTime(date, stMinutes, notes, device, purpose, breaks, eyeStrain); — Construct ScreenTime object.
+144: if (!screenTime.isValidDuration(stMinutes)) { — Validate duration.
+145: throw new InvalidActivityDurationException("Invalid duration for ScreenTime: " + stMinutes); — Error path.
+146: }
+147: currentUser.addActivity(screenTime); — Store in user's activities.
+148: System.out.println("Added: " + screenTime); — Print summary.
+149: System.out.println(screenTime.getProgress()); — Print progress/score.
+150: break; — End case 4.
+151: } — End switch over activity type.
+152: } catch (InvalidActivityDurationException ex) { — Specific validation exception handler.
+153: System.out.println("Error: " + ex.getMessage()); — Friendly error output.
+154: } catch (Exception ex) { — General safety catch-all to avoid crashing the app.
+155: System.out.println("An error occurred while logging activity: " + ex.getMessage()); — General error output.
+156: }
+157: } — End logNewActivity.
+158: Blank line.
+159: private static void updateActivity() { — Allows editing fields of a selected existing activity.
+160: Blank line (for readability) in code; method continues.
+161: try { — Wraps logic to catch and report unexpected issues during editing.
+162: System.out.println("-- Update Activity --"); — Header for update section.
+163: if (currentUser.getActivities().isEmpty()) { — If no activities, inform and exit.
+164: System.out.println("No activities to update."); — Informational message.
+165: return; — Early return; nothing to update.
+166: }
+167: for (int i = 0; i < currentUser.getActivities().size(); i++) { — List all activities with indices starting at 1.
+168: System.out.println((i + 1) + ". " + currentUser.getActivities().get(i)); — Print activity summary.
+169: }
+170: int idx = readInt("Select activity to update: ", 1, currentUser.getActivities().size()) - 1; — Read selection and convert to 0-based index.
+171: WellnessActivity activity = currentUser.getActivities().get(idx); — Retrieve the selected activity.
+172: Blank line for readability.
+173: if (activity instanceof Sleep sleep) { — If selection is Sleep, show Sleep-specific edit menu.
+174: boolean updating = true; — Loop flag to allow multiple edits.
+175: while (updating) { — Edit loop until Exit chosen.
+176: System.out.println("Which field do you want to update?"); — Prompt for field.
+177: System.out.println("1. Notes"); — Option to edit notes.
+178: System.out.println("2. Duration"); — Option to edit duration.
+179: System.out.println("3. Quality"); — Option to edit quality.
+180: System.out.println("4. Bedtime"); — Option to edit bedtime.
+181: System.out.println("5. Wake Time"); — Option to edit wake time.
+182: System.out.println("6. Nightmares"); — Option to edit nightmares flag.
+183: System.out.println("7. Exit"); — Exit editing for this activity.
+184: int choice = readInt("Choose (1-7): ", 1, 7); — Read a validated int selection.
+185: switch (choice) { — Apply specific updates.
+186: case 1: — Edit notes.
+187: String notes = readLine("New notes: "); — Get new notes string.
+188: if (!notes.isEmpty()) sleep.setNotes(notes); — Apply if non-empty.
+189: break; — Back to loop.
+190: case 2: — Edit duration.
+191: double dur = readHourAsMinutes("New duration in hours: ", 0, 24 * 60); — Read hours, convert to minutes, range-check.
+192: if (dur > 0 && sleep.isValidDuration(dur)) { — Validate new value.
+193: try { — Apply within try to catch validation exceptions from setter.
+194: sleep.setDuration(dur); — Set new duration.
+195: } catch (InvalidActivityDurationException e) { — Specific handler for bad duration.
+196: System.out.println("Error updating duration: " + e.getMessage()); — Print the reason.
+197: }
+198: }
+199: break; — Back to loop.
+200: case 3: — Edit quality.
+201: int qual = readInt("New quality (1-10): ", 1, 10); — Read validated quality.
+202: sleep.setQuality(qual); — Apply.
+203: break; — Back to loop.
+204: case 4: — Edit bedtime.
+205: LocalTime bt = readTime("New bedtime (HH:MM): ", true); — Optional time input.
+206: if (bt != null) sleep.setBedtime(bt); — Apply if provided.
+207: break; — Back to loop.
+208: case 5: — Edit wake time.
+209: LocalTime wt = readTime("New wake time (HH:MM): ", true); — Optional time input.
+210: if (wt != null) sleep.setWakeTime(wt); — Apply if provided.
+211: break; — Back to loop.
+212: case 6: — Edit nightmares flag.
+213: boolean nm = readYesNo("Had nightmares? (y/n): "); — Yes/No.
+214: sleep.setHadNightmares(nm); — Apply.
+215: break; — Back to loop.
+216: case 7: — Exit edits.
+217: updating = false; — Set loop flag to exit.
+218: break; — Break switch.
+219: } — End switch choice.
+220: } — End while updating.
+221: System.out.println("Activity updated: " + sleep); — Print final updated object state.
+222: } else if (activity instanceof Meditation meditation) { — If selection is Meditation.
+223: boolean updating = true; — Edit loop flag.
+224: while (updating) { — Edit loop for Meditation.
+225: System.out.println("Which field do you want to update?"); — Prompt.
+226: System.out.println("1. Notes"); — Options below mirror Meditation fields.
+227: System.out.println("2. Duration");
+228: System.out.println("3. Type");
+229: System.out.println("4. Focus");
+230: System.out.println("5. Distractions");
+231: System.out.println("6. Completed");
+232: System.out.println("7. Exit");
+233: int choice = readInt("Choose (1-7): ", 1, 7); — Read selection.
+234: switch (choice) { — Apply updates per case.
+235: case 1:
+236: String notes = readLine("New notes: "); — New notes.
+237: if (!notes.isEmpty()) meditation.setNotes(notes); — Apply.
+238: break;
+239: case 2:
+240: double dur = readHourAsMinutes("New duration in hours: ", 0, 3 * 60); — Hours→minutes.
+241: if (dur > 0 && meditation.isValidDuration(dur)) { — Validate.
+242: try { meditation.setDuration(dur); } catch (InvalidActivityDurationException e) { System.out.println("Error updating duration: " + e.getMessage()); }
+243: }
+244: break;
+245: case 3:
+246: String type = readLine("New meditation type: "); — New type.
+247: if (!type.isEmpty()) meditation.setMeditationType(type); — Apply.
+248: break;
+249: case 4:
+250: String focus = readLine("New focus area: "); — New focus.
+251: if (!focus.isEmpty()) meditation.setFocusArea(focus); — Apply.
+252: break;
+253: case 5:
+254: int dist = readInt("New distraction count: ", 0, Integer.MAX_VALUE); — Non-negative.
+255: meditation.setDistractionCount(dist); — Apply.
+256: break;
+257: case 6:
+258: boolean comp = readYesNo("Completed session? (y/n): "); — Yes/No.
+259: meditation.setCompletedSession(comp); — Apply.
+260: break;
+261: case 7:
+262: updating = false; — Exit loop.
+263: break;
+264: }
+265: }
+266: System.out.println("Activity updated: " + meditation); — Final summary.
+267: } else if (activity instanceof Journaling journaling) { — If selection is Journaling.
+268: boolean updating = true; — Loop flag.
+269: while (updating) { — Edit loop for Journaling.
+270: System.out.println("Which field do you want to update?"); — Prompt.
+271: System.out.println("1. Notes");
+272: System.out.println("2. Duration");
+273: System.out.println("3. Mood Before");
+274: System.out.println("4. Mood After");
+275: System.out.println("5. Word Count");
+276: System.out.println("6. Theme");
+277: System.out.println("7. Beneficial");
+278: System.out.println("8. Exit");
+279: int choice = readInt("Choose (1-8): ", 1, 8); — Read selection.
+280: switch (choice) {
+281: case 1:
+282: String notes = readLine("New notes: "); — New notes.
+283: if (!notes.isEmpty()) journaling.setNotes(notes);
+284: break;
+285: case 2:
+286: double dur = readHourAsMinutes("New duration in hours: ", 0, 2 * 60);
+287: if (dur > 0 && journaling.isValidDuration(dur)) {
+288: try { journaling.setDuration(dur); } catch (InvalidActivityDurationException e) { System.out.println("Error updating duration: " + e.getMessage()); }
+289: }
+290: break;
+291: case 3:
+292: int mb = readInt("New mood before (1-10): ", 1, 10); — Validated.
+293: journaling.setMoodBefore(mb);
+294: break;
+295: case 4:
+296: int ma = readInt("New mood after (1-10): ", 1, 10);
+297: journaling.setMoodAfter(ma);
+298: break;
+299: case 5:
+300: int wc = readInt("New word count: ", 0, Integer.MAX_VALUE);
+301: journaling.setWordCount(wc);
+302: break;
+303: case 6:
+304: String theme = readLine("New theme: ");
+305: if (!theme.isEmpty()) journaling.setJournalTheme(theme);
+306: break;
+307: case 7:
+308: boolean ben = readYesNo("Felt beneficial? (y/n): ");
+309: journaling.setFeltBeneficial(ben);
+310: break;
+311: case 8:
+312: updating = false; — Exit loop.
+313: break;
+314: }
+315: }
+316: System.out.println("Activity updated: " + journaling); — Final summary.
+317: } else if (activity instanceof ScreenTime screenTime) { — If selection is ScreenTime.
+318: boolean updating = true; — Loop flag.
+319: while (updating) { — Edit loop for ScreenTime.
+320: System.out.println("Which field do you want to update?"); — Prompt.
+321: System.out.println("1. Notes");
+322: System.out.println("2. Duration");
+323: System.out.println("3. Device");
+324: System.out.println("4. Purpose");
+325: System.out.println("5. Breaks");
+326: System.out.println("6. Eye Strain");
+327: System.out.println("7. Exit");
+328: int choice = readInt("Choose (1-7): ", 1, 7);
+329: switch (choice) {
+330: case 1:
+331: String notes = readLine("New notes: ");
+332: if (!notes.isEmpty()) screenTime.setNotes(notes);
+333: break;
+334: case 2:
+335: double dur = readHourAsMinutes("New duration in hours: ", 0, 24 * 60);
+336: if (dur > 0 && screenTime.isValidDuration(dur)) {
+337: try { screenTime.setDuration(dur); } catch (InvalidActivityDurationException e) { System.out.println("Error updating duration: " + e.getMessage()); }
+338: }
+339: break;
+340: case 3:
+341: String device = readLine("New device type: ");
+342: if (!device.isEmpty()) screenTime.setDeviceType(device);
+343: break;
+344: case 4:
+345: String purpose = readLine("New purpose: ");
+346: if (!purpose.isEmpty()) screenTime.setPurpose(purpose);
+347: break;
+348: case 5:
+349: int breaks = readInt("New breaks taken: ", 0, Integer.MAX_VALUE);
+350: screenTime.setBreaksTaken(breaks);
+351: break;
+352: case 6:
+353: boolean es = readYesNo("Caused eye strain? (y/n): ");
+354: screenTime.setCausedEyeStrain(es);
+355: break;
+356: case 7:
+357: updating = false; — Exit loop.
+358: break;
+359: }
+360: }
+361: System.out.println("Activity updated: " + screenTime);
+362: }
+363: }catch (Exception ex) { — Catches any unexpected exception to avoid breaking the loop.
+364: System.out.println("An error occurred while updating activity: " + ex.getMessage()); — Print error.
+365: }
+366: } — End updateActivity.
+367: Blank line.
+368: // Option 3: Log Mood/Stress — simple, validated inputs. — Comment.
+369: private static void logMoodStress() { — Starts mood/stress logging flow.
+370: System.out.println("-- Log Mood/Stress --"); — Header.
+371: LocalDate date = readDate("Enter date (YYYY-MM-DD), blank for today: "); — Date input.
+372: int mood = readInt("Mood level (1-10): ", 1, 10); — Mood value.
+373: int stress = readInt("Stress level (1-10): ", 1, 10); — Stress value.
+374: String tags = readLine("Mood tags (comma-separated, optional): "); — Optional tags string.
+375: String triggers = readLine("Stress triggers (comma-separated, optional): "); — Optional triggers string.
+376: String notes = readLine("Notes (optional): "); — Optional notes.
+377: try { — Try block around validation and saving.
+378: MoodStressEntry entry = new MoodStressEntry(date, mood, stress, tags, triggers, notes); — Create entry.
+379: currentUser.addMoodStressEntry(entry); — Save to user's in-memory list.
+380: System.out.println("Saved: " + entry); — Print summary.
+381: } catch (IllegalArgumentException ex) { — Bad value handling.
+382: System.out.println("Error: " + ex.getMessage()); — Print why.
+383: }
+384: } — End logMoodStress.
+385: Blank line.
+386: // Option 4: Set/Update Wellness Goals — simple add and minimal update. — Comment.
+387: private static void setUpdateWellnessGoals() { — Entry to goal add/update menu.
+388: System.out.println("-- Set/Update Wellness Goals --"); — Header.
+389: System.out.println("1. Add new goal"); — Sub-menu.
+390: System.out.println("2. Update existing goal (target value/description)"); — Sub-menu.
+391: int choice = readInt("Your choice (1-2): ", 1, 2); — Submenu selection.
+392: if (choice == 1) { — Route to add.
+393: addGoalFlow(); — Add flow.
+394: } else { — Else update.
+395: updateGoalFlow(); — Update flow.
+396: }
+397: } — End setUpdateWellnessGoals.
+398: Blank line.
+399: private static void addGoalFlow() { — Adds a new goal to the user's list.
+400: System.out.println("Available goal types:"); — Header.
+401: String[] types = GoalType.ALL_GOAL_TYPES; — Source of allowed goal type labels.
+402: for (int i = 0; i < types.length; i++) { — Loop through goal types for display.
+403: System.out.println("  " + (i + 1) + ". " + types[i]); — Show item index and label.
+404: }
+405: int idx = readInt("Select goal type: ", 1, types.length) - 1; — Choose type index.
+406: String goalType = types[idx]; — Resolve to string label.
+407: double target = readDouble("Target value (>0): ", 0.000001, Double.MAX_VALUE); — Positive target constraint.
+408: LocalDate start = readDate("Start date (YYYY-MM-DD), blank for today: "); — Start date.
+409: LocalDate end = readDate("End date (YYYY-MM-DD), blank for today: "); — End date.
+410: String desc = readLine("Short description: "); — Optional description.
+411: try { — Try to build and save goal.
+412: WellnessGoal goal = new WellnessGoal(goalType, target, start, end, desc); — Construct WellnessGoal.
+413: currentUser.addGoal(goal); — Save to user's in-memory goal list.
+414: System.out.println("Added: " + goal); — Print summary.
+415: } catch (IllegalArgumentException ex) { — Validation failure path.
+416: System.out.println("Error: " + ex.getMessage()); — Show why construction failed.
+417: }
+418: } — End addGoalFlow.
+419: Blank line.
+420: private static void updateGoalFlow() { — Updates target or description of an existing goal.
+421: if (currentUser.getWellnessGoals().isEmpty()) { — If user has no goals yet, prompt to add first.
+422: System.out.println("No goals yet. Add one first."); — Inform and exit.
+423: return; — Early return.
+424: }
+425: System.out.println("Your goals:"); — Header.
+426: for (int i = 0; i < currentUser.getWellnessGoals().size(); i++) { — List goals.
+427: WellnessGoal g = currentUser.getWellnessGoals().get(i); — Retrieve.
+428: System.out.println("  " + (i + 1) + ". " + g); — Print with index.
+429: }
+430: int idx = readInt("Select a goal to update: ", 1, currentUser.getWellnessGoals().size()) - 1; — Choose goal index.
+431: WellnessGoal goal = currentUser.getWellnessGoals().get(idx); — Get the chosen goal.
+432: System.out.println("1. Update target value"); — Sub-choice 1.
+433: System.out.println("2. Update description"); — Sub-choice 2.
+434: int what = readInt("Choose (1-2): ", 1, 2); — Read sub-choice.
+435: try { — Try to update chosen field.
+436: if (what == 1) { — Update target.
+437: double newTarget = readDouble("New target (>0): ", 0.000001, Double.MAX_VALUE); — Validated target.
+438: goal.setTargetValue(newTarget); — Apply.
+439: } else { — Update description.
+440: String newDesc = readLine("New description: "); — Read text.
+441: goal.setDescription(newDesc); — Apply.
+442: }
+443: System.out.println("Updated: " + goal); — Print updated goal state.
+444: } catch (IllegalArgumentException ex) { — Handle validation failures.
+445: System.out.println("Error: " + ex.getMessage()); — Show reason.
+446: }
+447: } — End updateGoalFlow.
+448: Blank line.
+449: // Option 5 stub — simple readout of recent data. — Comment.
+450: private static void viewWellnessProgress() { — Shows current snapshot of user, recent items, and goals.
+451: System.out.println("-- Wellness Progress --"); — Header.
+452: System.out.println(currentUser); — Prints User.toString() (name, join date, counts summary).
+453: System.out.println("Recent activities:"); — Header for activities list.
+454: for (WellnessActivity a : currentUser.getRecentActivities(5)) { — Loop last 5 activities.
+455: System.out.println("  - " + a); — Print activity summary.
+456: }
+457: System.out.println("Mood/Stress entries (latest 5):"); — Header.
+458: int shown = 0; — Counter to limit to 5.
+459: for (int i = currentUser.getMoodStressEntries().size() - 1; i >= 0 && shown < 5; i--) { — Iterate from latest backwards.
+460: System.out.println("  - " + currentUser.getMoodStressEntries().get(i)); — Print entry summary.
+461: shown++; — Increment counter.
+462: }
+463: if (currentUser.getWellnessGoals().isEmpty()) { — If no goals.
+464: System.out.println("No goals set yet."); — Inform.
+465: } else { — Else list all goals.
+466: System.out.println("Goals:"); — Header.
+467: for (WellnessGoal g : currentUser.getWellnessGoals()) { — Loop goals.
+468: System.out.println("  - " + g); — Print goal summary.
+469: }
+470: }
+471: } — End viewWellnessProgress.
+472: Blank line.
+473: // Option 6 stub — outline only. — Comment.
+474: private static void generateWellnessReports() { — Prints categorized summaries of all data.
+475: System.out.println("-- Generate Wellness Reports --"); — Section header.
+476: Blank line within generated output.
+477: if (currentUser.getActivities().isEmpty()) { — If no activities, report and return.
+478: System.out.println("No activities logged yet."); — Informational message.
+479: return; — Exit early.
+480: }
+481: Blank line separation in output.
+482: System.out.println("=== ACTIVITY SUMMARIES ===\n"); — Main section header for summaries.
+483: Blank line.
+484: System.out.println("--- SLEEP ACTIVITIES ---"); — Sub-section header.
+485: boolean hasSleep = false; — Tracks if at least one item was printed.
+486: for (WellnessActivity activity : currentUser.getActivities()) { — Iterate all activities.
+487: if (activity instanceof Sleep) { — Filter to Sleep.
+488: System.out.println("• " + activity.toString()); — Print bullet with summary.
+489: hasSleep = true; — Mark presence.
+490: }
+491: }
+492: if (!hasSleep) System.out.println("No sleep activities logged."); — Fallback message.
+493: System.out.println(); — Blank line.
+494: System.out.println("--- MEDITATION ACTIVITIES ---"); — Sub-section header.
+495: boolean hasMeditation = false; — Tracker.
+496: for (WellnessActivity activity : currentUser.getActivities()) { — Iterate.
+497: if (activity instanceof Meditation) { — Filter to Meditation.
+498: System.out.println("• " + activity.toString()); — Bullet.
+499: hasMeditation = true; — Mark presence.
+500: }
+501: }
+502: if (!hasMeditation) System.out.println("No meditation activities logged."); — Fallback.
+503: System.out.println(); — Blank line.
+504: System.out.println("--- JOURNALING ACTIVITIES ---"); — Sub-section header.
+505: boolean hasJournaling = false; — Tracker.
+506: for (WellnessActivity activity : currentUser.getActivities()) { — Iterate.
+507: if (activity instanceof Journaling) { — Filter.
+508: System.out.println("• " + activity.toString()); — Bullet.
+509: hasJournaling = true; — Mark.
+510: }
+511: }
+512: if (!hasJournaling) System.out.println("No journaling activities logged."); — Fallback.
+513: System.out.println(); — Blank line.
+514: System.out.println("--- SCREEN TIME ACTIVITIES ---"); — Sub-section header.
+515: boolean hasScreenTime = false; — Tracker.
+516: for (WellnessActivity activity : currentUser.getActivities()) { — Iterate.
+517: if (activity instanceof ScreenTime) { — Filter.
+518: System.out.println("• " + activity.toString()); — Bullet.
+519: hasScreenTime = true; — Mark.
+520: }
+521: }
+522: if (!hasScreenTime) System.out.println("No screen time activities logged."); — Fallback.
+523: System.out.println(); — Blank line.
+524: if (!currentUser.getMoodStressEntries().isEmpty()) { — If there are mood entries.
+525: System.out.println("--- MOOD/STRESS ENTRIES ---"); — Header.
+526: for (MoodStressEntry entry : currentUser.getMoodStressEntries()) { — Iterate entries.
+527: System.out.println("• " + entry.toString()); — Bullet.
+528: }
+529: System.out.println(); — Blank line.
+530: }
+531: if (!currentUser.getWellnessGoals().isEmpty()) { — If goals exist.
+532: System.out.println("--- WELLNESS GOALS ---"); — Header.
+533: for (WellnessGoal goal : currentUser.getWellnessGoals()) { — Iterate goals.
+534: System.out.println("• " + goal.toString()); — Bullet.
+535: }
+536: }
+537: } — End generateWellnessReports.
+538: Blank line.
+539: // Option 7 placeholder: simple breathing suggestion. — Comment.
+540: private static void innovativeFeature() { — Prints a motivational breathing tip.
+541: System.out.println("-- Quick Calm Breathing Coach --"); — Section header.
+542: System.out.println("Try 4-4-6 breathing for 1 minute: Inhale 4s, Hold 4s, Exhale 6s. You got this!"); — Tip text.
+543: } — End innovativeFeature.
+544: Blank line.
+545: // ===================== — Start of helper methods section.
+546: // Input helper methods — simple and robust. — Comment block title.
+547: // ===================== — End of helper methods title block.
+548: private static int readInt(String prompt, int min, int max) { — Reads an int with bounds checking and re-prompts on invalid input.
+549: while (true) { — Loop until a valid number is entered.
+550: System.out.print(prompt); — Show prompt.
+551: String line = scanner.nextLine().trim(); — Read a line.
+552: try { — Parse attempt.
+553: int v = Integer.parseInt(line); — Convert to int.
+554: if (v < min || v > max) throw new NumberFormatException(); — Enforce bounds by reusing exception path.
+555: return v; — Valid value.
+556: } catch (NumberFormatException ex) { — Invalid input.
+557: System.out.println("Please enter a valid number between " + min + " and " + max + "."); — Guidance.
+558: }
+559: }
+560: } — End readInt.
+561: Blank line.
+562: private static double readDouble(String prompt, double min, double max) { — Reads a double with min/max and re-prompts on errors.
+563: while (true) { — Loop until valid.
+564: System.out.print(prompt); — Prompt.
+565: String line = scanner.nextLine().trim(); — Get input.
+566: try { — Parse attempt.
+567: double v = Double.parseDouble(line); — To double.
+568: if (v < min || v > max) throw new NumberFormatException(); — Range check.
+569: return v; — Valid.
+570: } catch (NumberFormatException ex) { — Invalid.
+571: String maxTxt = (max == Double.MAX_VALUE) ? "+∞" : String.valueOf(max); — Human-friendly max label.
+572: System.out.println("Please enter a valid number in range [" + min + ", " + maxTxt + "]."); — Guidance.
+573: }
+574: }
+575: } — End readDouble.
+576: Blank line.
+577: private static LocalDate readDate(String prompt) { — Reads a LocalDate; blank returns today; re-prompts until valid.
+578: System.out.print(prompt); — Prompt.
+579: String line = scanner.nextLine().trim(); — Read.
+580: if (line.isEmpty()) return LocalDate.now(); — Default to today if blank.
+581: while (true) { — Retry loop.
+582: try { return LocalDate.parse(line); } catch (Exception ex) { — Try parse; on failure prompt again.
+583: System.out.print("Invalid date format. Please use YYYY-MM-DD: "); — Guidance.
+584: line = scanner.nextLine().trim(); — Read again.
+585: if (line.isEmpty()) return LocalDate.now(); — Allow blank fallback to today on re-prompt.
+586: }
+587: }
+588: } — End readDate.
+589: Blank line.
+590: private static LocalTime readTime(String prompt, boolean allowBlank) { — Reads a LocalTime; may permit blank (null) depending on allowBlank.
+591: System.out.print(prompt); — Prompt.
+592: String line = scanner.nextLine().trim(); — Read string.
+593: if (allowBlank && line.isEmpty()) return null; — Return null if allowed and blank.
+594: while (true) { — Retry until valid or blank allowed.
+595: try { return LocalTime.parse(line); } catch (Exception ex) { — Try parse.
+596: System.out.print("Invalid time format. Please use HH:MM: "); — Guidance.
+597: line = scanner.nextLine().trim(); — Read again.
+598: if (allowBlank && line.isEmpty()) return null; — Allow blank on retry.
+599: }
+600: }
+601: } — End readTime.
+602: Blank line.
+603: private static double readHourAsMinutes(String prompt, double min, double max) { — Reads a number of hours, converts to minutes, enforces [min,max].
+604: while (true) { — Retry loop.
+605: System.out.print(prompt); — Prompt.
+606: String line = scanner.nextLine().trim(); — Read input.
+607: if (line.isEmpty()) return -1; — Special-case: empty string returns -1 to signal "no change" when used in update flows.
+608: try { — Parse attempt.
+609: double hour = Double.parseDouble(line); — Hours as double.
+610: double minutes = hour * 60; — Convert to minutes.
+611: if (minutes < min || minutes > max) throw new NumberFormatException(); — Range check.
+612: return minutes; — Return minutes.
+613: } catch (NumberFormatException ex) { — On error, explain acceptable range.
+614: System.out.println("Please enter a valid hour so that minutes are in range [" + min + ", " + max + "]."); — Guidance message.
+615: }
+616: }
+617: } — End readHourAsMinutes.
+618: Blank line.
+619: private static boolean readYesNo(String prompt) { — Reads a boolean yes/no response, tolerant of "y/yes" and "n/no".
+620: while (true) { — Retry until valid.
+621: System.out.print(prompt); — Prompt.
+622: String s = scanner.nextLine().trim().toLowerCase(); — Read and normalize.
+623: if (s.equals("y") || s.equals("yes")) return true; — Map to true.
+624: if (s.equals("n") || s.equals("no")) return false; — Map to false.
+625: System.out.println("Please enter 'y' or 'n'."); — Guidance.
+626: }
+627: } — End readYesNo.
+628: Blank line.
+629: private static String readLine(String prompt) { — Reads an entire line of text (trimmed), may be empty.
+630: System.out.print(prompt); — Prompt.
+631: return scanner.nextLine().trim(); — Read and trim.
+632: } — End readLine.
+633: } — End class Main.
+
+How objects run around (high-level flow)
+- The program builds a single User at startup (line 22). That object is stored in the static field currentUser (line 13), so it is accessible to all static methods in Main.
+- When you log a new activity (logNewActivity), Main constructs one of Sleep/Meditation/Journaling/ScreenTime (lines 100, 114, 129, 143 respectively) using values read from the console. Each object is validated (isValidDuration) immediately after creation. If valid, it is added to User via currentUser.addActivity(...) (lines 104, 118, 133, 147). User maintains an in-memory list of activities for the session.
+- When you update an activity (updateActivity), Main lists all activities from currentUser.getActivities(), reads a selection, then branches based on the actual runtime type with instanceof. It reads the new values and invokes the corresponding setters on the concrete activity object (e.g., sleep.setQuality, meditation.setMeditationType). Updates happen in-place on the object stored inside the User’s list (references are the same), so changes are immediately reflected.
+- Mood/stress logging (logMoodStress) creates a MoodStressEntry (line 378) and adds it to the User via currentUser.addMoodStressEntry (line 379). User stores this in another in-memory list.
+- Goals (setUpdateWellnessGoals → addGoalFlow/updateGoalFlow) create and add WellnessGoal (line 412) or update fields on an existing goal object. These are stored in the User’s in-memory goals list.
+- Viewing progress (viewWellnessProgress) prints User.toString(), the latest 5 activities, the latest 5 mood entries, and all goals fetched from the User object. No computations beyond formatting here; all data comes directly from User’s lists.
+- Generating reports (generateWellnessReports) walks through the currentUser’s in-memory lists and prints categorized summaries using toString() of each object.
+
+Where data is saved
+- In-memory only, inside the currentUser User object created at startup.
+- No files or databases are written; exiting the app clears all data because the process ends.
+
+Key variables and methods summary
+- currentUser (static User): The single in-memory store for the session (activities, moods, goals).
+- scanner (static Scanner): Reads console input for all flows.
+- main(...): Bootstraps user and routes to features in a loop until exit.
+- displayMainMenu(): Pure output; shows options and the current user header.
+- logNewActivity(): Collects inputs, constructs a specific activity object, validates, and saves to currentUser.
+- updateActivity(): Lets the user pick an existing activity and edit its fields safely with validation.
+- logMoodStress(): Adds a single MoodStressEntry to currentUser.
+- setUpdateWellnessGoals(): Presents sub-menu to add or update a goal.
+- addGoalFlow(): Displays list of GoalType labels, reads inputs, creates WellnessGoal, and saves it.
+- updateGoalFlow(): Selects a goal from currentUser and updates target/description.
+- viewWellnessProgress(): Prints snapshot summaries (recent activities, recent mood logs, and goals).
+- generateWellnessReports(): Walks all data to print categorized summaries.
+- innovativeFeature(): Lightweight well-being tip.
+- readInt/readDouble/readDate/readTime/readHourAsMinutes/readYesNo/readLine: Input utilities that validate and re-prompt as needed, keeping all input logic centralized and consistent.
+
+Notes and minor observations
+- Scoring outputs (e.g., screen time) are printed via each activity’s getProgress(). If a score can exceed 100% (as seen in your run with 101.0%), clamping logic would likely belong inside those getProgress() implementations rather than Main.
+- readHourAsMinutes returns -1 on empty input, which is used in update flows as a "no change" signal when appropriate (call sites check for >0 before applying).
+- All exception handling in Main is user-friendly; errors are caught and printed without terminating the session loop.
