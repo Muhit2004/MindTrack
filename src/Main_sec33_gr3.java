@@ -1,15 +1,9 @@
-/*
-  Replaced the IntelliJ template with a full console menu application as requested.
-  Implemented: session User management, main menu, Option 1 (Log New Activity) with submenu,
-  basic Option 3 (Log Mood/Stress) and Option 4 (Set/Update Wellness Goals) flows.
-  No HashMap or enum used; simple arrays/conditionals only. — [Changed Code]
-*/
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Scanner;
 
-public class Main {
+public class Main_sec33_gr3 {
     //just one sessions
     private static User currentUser;
     private static final Scanner scanner = new Scanner(System.in);
@@ -118,7 +112,7 @@ public class Main {
                     LocalTime wake = readTime("Wake time (HH:MM), blank to skip: ", true);
                     boolean nightmares = readYesNo("Had nightmares? (y/n): ");
 
-                    Sleep sleep = new Sleep(date, sleepMinutes, notes, quality, bedtime, wake, nightmares); //object
+                    Sleep_sec33_gr_3 sleep = new Sleep_sec33_gr_3(date, sleepMinutes, notes, quality, bedtime, wake, nightmares); //object
 
                     if (!sleep.isValidDuration(sleepMinutes)) {
                         throw new InvalidActivityDurationException("Invalid duration for Sleep: " + sleepMinutes);
@@ -135,7 +129,7 @@ public class Main {
                     int distractions = readInt("Distraction count (0+): ", 0, Integer.MAX_VALUE);
                     boolean completed = readYesNo("Completed session? (y/n): ");
 
-                    Meditation meditation = new Meditation(date, medMinutes, notes, medType, focus, distractions, completed);
+                    Meditation_sec33_gr3 meditation = new Meditation_sec33_gr3(date, medMinutes, notes, medType, focus, distractions, completed);
                     if (!meditation.isValidDuration(medMinutes)) {
                         throw new InvalidActivityDurationException("Invalid duration for Meditation: " + medMinutes);
                     }
@@ -153,7 +147,7 @@ public class Main {
                     String theme = readLine("Journal theme (gratitude/reflection/goals/free-writing/etc.): ");
                     boolean beneficial = readYesNo("Felt beneficial? (y/n): ");
 
-                    Journaling journaling = new Journaling(date, jrnlMinutes, notes, moodBefore, moodAfter, words, theme, beneficial);
+                    Journaling_sec33_gr3 journaling = new Journaling_sec33_gr3(date, jrnlMinutes, notes, moodBefore, moodAfter, words, theme, beneficial);
                     if (!journaling.isValidDuration(jrnlMinutes)) {
                         throw new InvalidActivityDurationException("Invalid duration for Journaling: " + jrnlMinutes);
                     }
@@ -169,7 +163,7 @@ public class Main {
                     int breaks = readInt("Breaks taken (0+): ", 0, Integer.MAX_VALUE);
                     boolean eyeStrain = readYesNo("Caused eye strain? (y/n): ");
 
-                    ScreenTime screenTime = new ScreenTime(date, stMinutes, notes, device, purpose, breaks, eyeStrain);
+                    ScreenTime_sec33_gr3 screenTime = new ScreenTime_sec33_gr3(date, stMinutes, notes, device, purpose, breaks, eyeStrain);
                     if (!screenTime.isValidDuration(stMinutes)) {
                         throw new InvalidActivityDurationException("Invalid duration for ScreenTime: " + stMinutes);
                     }
@@ -203,9 +197,9 @@ public class Main {
                 System.out.println((i + 1) + ". " + currentUser.getActivities().get(i));
             }
             int idx = readInt("Select activity to update: ", 1, currentUser.getActivities().size()) - 1;
-            WellnessActivity activity = currentUser.getActivities().get(idx);
+            WellnessActivity_sec33_gr3 activity = currentUser.getActivities().get(idx);
 
-            if (activity instanceof Sleep sleep) {
+            if (activity instanceof Sleep_sec33_gr_3 sleep) {
                 boolean updating = true;
                 while (updating) {
                     System.out.println("Which field do you want to update?");
@@ -254,7 +248,7 @@ public class Main {
                     }
                 }
                 System.out.println("Activity updated: " + sleep);
-            } else if (activity instanceof Meditation meditation) {  //using interface functions makes it easier for us
+            } else if (activity instanceof Meditation_sec33_gr3 meditation) {  //using interface functions makes it easier for us
                 boolean updating = true;
                 while (updating) {
                     System.out.println("Which field do you want to update?");
@@ -303,7 +297,7 @@ public class Main {
                     }
                 }
                 System.out.println("Activity updated: " + meditation);
-            } else if (activity instanceof Journaling journaling) {
+            } else if (activity instanceof Journaling_sec33_gr3 journaling) {
                 boolean updating = true;
                 while (updating) {
                     System.out.println("Which field do you want to update?");
@@ -357,7 +351,7 @@ public class Main {
                     }
                 }
                 System.out.println("Activity updated: " + journaling);
-            } else if (activity instanceof ScreenTime screenTime) {
+            } else if (activity instanceof ScreenTime_sec33_gr3 screenTime) {
                 boolean updating = true;
                 while (updating) {
                     System.out.println("Which field do you want to update?");
@@ -427,7 +421,7 @@ public class Main {
         String triggers = readLine("Stress triggers (comma-separated, optional): ");
         String notes = readLine("Notes (optional): ");
         try {
-            MoodStressEntry entry = new MoodStressEntry(date, mood, stress, tags, triggers, notes);
+            MoodStressEntry_sec33_gr3 entry = new MoodStressEntry_sec33_gr3(date, mood, stress, tags, triggers, notes);
             currentUser.addMoodStressEntry(entry);
             System.out.println("Saved: " + entry);
         } catch (IllegalArgumentException ex) {
@@ -462,7 +456,7 @@ public class Main {
     private static void addGoalFlow() {
 
         System.out.println("Available goal types:");
-        String[] types = GoalType.ALL_GOAL_TYPES;  // using goaltype array from goalType.java
+        String[] types = GoalType_sec33_gr3.ALL_GOAL_TYPES;  // using goaltype array from GoalType_sec33_gr3.java
         for (int i = 0; i < types.length; i++) {
             System.out.println("  " + (i + 1) + ". " + types[i]); //shows goaltypes in order
         }
@@ -473,7 +467,7 @@ public class Main {
         LocalDate end = readDate("End date (YYYY-MM-DD), blank for today: ");
         String desc = readLine("Short description: ");
         try {
-            WellnessGoal goal = new WellnessGoal(goalType, target, start, end, desc);
+            WellnessGoal_sec33_gr3 goal = new WellnessGoal_sec33_gr3(goalType, target, start, end, desc);
             currentUser.addGoal(goal);
             System.out.println("Added: " + goal);
         } catch (IllegalArgumentException ex) {
@@ -493,11 +487,11 @@ public class Main {
         }
         System.out.println("Your goals:");
         for (int i = 0; i < currentUser.getWellnessGoals().size(); i++) {
-            WellnessGoal g = currentUser.getWellnessGoals().get(i);
+            WellnessGoal_sec33_gr3 g = currentUser.getWellnessGoals().get(i);
             System.out.println("  " + (i + 1) + ". " + g);
         }
         int idx = readInt("Select a goal to update: ", 1, currentUser.getWellnessGoals().size()) - 1;
-        WellnessGoal goal = currentUser.getWellnessGoals().get(idx);
+        WellnessGoal_sec33_gr3 goal = currentUser.getWellnessGoals().get(idx);
         System.out.println("1. Update target value");
         System.out.println("2. Update description");
         int what = readInt("Choose (1-2): ", 1, 2);
@@ -524,7 +518,7 @@ public class Main {
         System.out.println("-- Wellness Progress --");
         System.out.println(currentUser);
         System.out.println("Recent activities:");
-        for (WellnessActivity a : currentUser.getRecentActivities(5)) {
+        for (WellnessActivity_sec33_gr3 a : currentUser.getRecentActivities(5)) {
             System.out.println("  - " + a);
         }
         System.out.println("Mood/Stress entries (latest 5):");
@@ -537,7 +531,7 @@ public class Main {
             System.out.println("No goals set yet.");
         } else {
             System.out.println("Goals:");
-            for (WellnessGoal g : currentUser.getWellnessGoals()) {
+            for (WellnessGoal_sec33_gr3 g : currentUser.getWellnessGoals()) {
                 System.out.println("  - " + g);
             }
         }
@@ -551,6 +545,8 @@ public class Main {
      */
 
     private static void generateWellnessReports() {
+
+
         System.out.println("-- Generate Wellness Reports --");
 
         if (currentUser.getActivities().isEmpty()) {
@@ -563,8 +559,8 @@ public class Main {
         // Sleep Summary
         System.out.println("--- SLEEP ACTIVITIES ---");
         boolean hasSleep = false;
-        for (WellnessActivity activity : currentUser.getActivities()) {
-            if (activity instanceof Sleep) {
+        for (WellnessActivity_sec33_gr3 activity : currentUser.getActivities()) {
+            if (activity instanceof Sleep_sec33_gr_3) {
                 System.out.println("• " + activity.toString());
                 hasSleep = true;
             }
@@ -575,8 +571,8 @@ public class Main {
         // Meditation Summary
         System.out.println("--- MEDITATION ACTIVITIES ---");
         boolean hasMeditation = false;
-        for (WellnessActivity activity : currentUser.getActivities()) {
-            if (activity instanceof Meditation) {
+        for (WellnessActivity_sec33_gr3 activity : currentUser.getActivities()) {
+            if (activity instanceof Meditation_sec33_gr3) {
                 System.out.println("• " + activity.toString());
                 hasMeditation = true;
             }
@@ -587,8 +583,8 @@ public class Main {
         // Journaling Summary
         System.out.println("--- JOURNALING ACTIVITIES ---");
         boolean hasJournaling = false;
-        for (WellnessActivity activity : currentUser.getActivities()) {
-            if (activity instanceof Journaling) {
+        for (WellnessActivity_sec33_gr3 activity : currentUser.getActivities()) {
+            if (activity instanceof Journaling_sec33_gr3) {
                 System.out.println("• " + activity.toString());
                 hasJournaling = true;
             }
@@ -599,8 +595,8 @@ public class Main {
         // Screen Time Summary
         System.out.println("--- SCREEN TIME ACTIVITIES ---");
         boolean hasScreenTime = false;
-        for (WellnessActivity activity : currentUser.getActivities()) {
-            if (activity instanceof ScreenTime) {
+        for (WellnessActivity_sec33_gr3 activity : currentUser.getActivities()) {
+            if (activity instanceof ScreenTime_sec33_gr3) {
                 System.out.println("• " + activity.toString());
                 hasScreenTime = true;
             }
@@ -611,7 +607,7 @@ public class Main {
         // Mood/Stress entries
         if (!currentUser.getMoodStressEntries().isEmpty()) {
             System.out.println("--- MOOD/STRESS ENTRIES ---");
-            for (MoodStressEntry entry : currentUser.getMoodStressEntries()) {
+            for (MoodStressEntry_sec33_gr3 entry : currentUser.getMoodStressEntries()) {
                 System.out.println("• " + entry.toString());
             }
             System.out.println();
@@ -620,7 +616,7 @@ public class Main {
         // Wellness goals
         if (!currentUser.getWellnessGoals().isEmpty()) {
             System.out.println("--- WELLNESS GOALS ---");
-            for (WellnessGoal goal : currentUser.getWellnessGoals()) {
+            for (WellnessGoal_sec33_gr3 goal : currentUser.getWellnessGoals()) {
                 System.out.println("• " + goal.toString());
             }
         }
@@ -630,6 +626,7 @@ public class Main {
      remove activity option , chack user to understand
     */
     private static void removeActivity() {
+
         System.out.println("-- Remove Activity --");
         if (currentUser.getActivities().isEmpty()) {
             System.out.println("No activities logged yet.");
@@ -637,7 +634,7 @@ public class Main {
         }
         System.out.println("Your activities:");
         for (int i = 0; i < currentUser.getActivities().size(); i++) {
-            WellnessActivity a = currentUser.getActivities().get(i);
+            WellnessActivity_sec33_gr3 a = currentUser.getActivities().get(i);
             System.out.println("  " + (i + 1) + ". " + a);
         }
 
@@ -645,6 +642,7 @@ public class Main {
 
         currentUser.removeActivity(idx);
         System.out.println("Removed activity.");
+
 
 
     }

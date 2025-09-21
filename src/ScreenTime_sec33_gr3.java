@@ -4,8 +4,7 @@ import java.time.LocalDate;
  * ScreenTime activity class - tracks digital device usage and there health effects
  * Extends WellnessActivity and implements Trackable interface
  * Helps users monitor screen time and reduce eye strain from to much device use
- */
-public class ScreenTime extends WellnessActivity implements Trackable {
+ */public class ScreenTime_sec33_gr3 extends WellnessActivity_sec33_gr3 implements Trackable_sec33_gr3 {
 
     // Screen time specific fields for tracking device usage and health impact
     private String deviceType; // "phone", "computer", "tablet", "tv" - what device they used
@@ -14,12 +13,14 @@ public class ScreenTime extends WellnessActivity implements Trackable {
     private boolean causedEyeStrain; // did the screen time hurt there eyes
     private boolean usedBlueLightFilter; // did they use blue light protection
 
+
+
     /**
      * Constructor for creating a new screen time activity
      * Takes all the importent screen time details like device and purpose
      * Blue light filter is set to false by default but can be changed later
      */
-    public ScreenTime(LocalDate date, double duration, String notes, String deviceType,
+    public ScreenTime_sec33_gr3(LocalDate date, double duration, String notes, String deviceType,
                       String purpose, int breaksTaken, boolean causedEyeStrain) {
         super(date, duration, notes);
         this.deviceType = deviceType;
@@ -91,6 +92,18 @@ public class ScreenTime extends WellnessActivity implements Trackable {
      */
     public void setUsedBlueLightFilter(boolean usedBlueLightFilter) { this.usedBlueLightFilter = usedBlueLightFilter; }
 
+    /**
+     * Sets new notes for the screen time activity
+     * Useful for adding details or reminders about this session
+     */
+    public void setNotes(String notes) { super.setNotes(notes); }
+
+    /**
+     * Sets a new duration for the screen time activity
+     * Duration must be valid according to the isValidDuration method
+     */
+    public void setDuration(double duration) throws InvalidActivityDurationException { super.setDuration(duration); }
+
     // Abstract method implementations - required by parent WellnessActivity class
 
     /**
@@ -147,8 +160,8 @@ public class ScreenTime extends WellnessActivity implements Trackable {
      * Returns true if usage stayed under the target limit - lower is better for screen time
      */
     @Override
-    public boolean meetsGoal(WellnessGoal goal) {
-        if (goal.getGoalType() == GoalType.SCREEN_TIME_LIMIT) {
+    public boolean meetsGoal(WellnessGoal_sec33_gr3 goal) {
+        if (goal.getGoalType() == GoalType_sec33_gr3.SCREEN_TIME_LIMIT) {
             return getDuration() <= goal.getTargetValue(); // Goal is to stay under limit
         }
         return false; // wrong goal type or went over limit

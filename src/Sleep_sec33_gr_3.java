@@ -6,7 +6,7 @@ import java.time.LocalTime;
  * Extends WellnessActivity and implements Trackable interface
  * Helps users monitor there sleep habits and improve them
  */
-public class Sleep extends WellnessActivity implements Trackable {
+public class Sleep_sec33_gr_3 extends WellnessActivity_sec33_gr3 implements Trackable_sec33_gr3 {
 
     // Sleep fields for tracking sleep quality and timing
     private int quality; // 1-10 scale - how good was the sleep
@@ -19,7 +19,7 @@ public class Sleep extends WellnessActivity implements Trackable {
      * Takes all the importent sleep details and stores them
      * Quality gets clamped between 1-10 automaticaly
      */
-    public Sleep(LocalDate date, double duration, String notes, int quality,
+    public Sleep_sec33_gr_3(LocalDate date, double duration, String notes, int quality,
                  LocalTime bedtime, LocalTime wakeTime, boolean hadNightmares) {
         super(date, duration, notes);
         this.quality = Math.min(Math.max(quality, 1), 10); // keeps quality in valid range
@@ -129,8 +129,8 @@ public class Sleep extends WellnessActivity implements Trackable {
      * Returns true if sleep duration meets or exceeds the goal target
      */
     @Override
-    public boolean meetsGoal(WellnessGoal goal) {
-        if (goal.getGoalType() == GoalType.SLEEP_HOURS) {
+    public boolean meetsGoal(WellnessGoal_sec33_gr3 goal) {
+        if (goal.getGoalType() == GoalType_sec33_gr3.SLEEP_HOURS) {
             return (getDuration() / 60.0) >= goal.getTargetValue();
         }
         return false; // doesn't meet goal or wrong goal type

@@ -5,7 +5,7 @@ import java.time.LocalDate;
  * Provides common functionality that all activities share like date and duration
  * Makes it easier to work with diferent types of activities using polymorphism
  */
-public abstract class WellnessActivity {
+public abstract class WellnessActivity_sec33_gr3 {
 
     // Common fields that every wellness activity needs to have
     protected int activityId; // unique ID for each activity - helps with tracking
@@ -19,7 +19,7 @@ public abstract class WellnessActivity {
      * Takes the basic info that all activities need and generates a unique ID
      * Duration is in minutes to keep everything consistant across all activity types
      */
-    public WellnessActivity(LocalDate date, double duration, String notes) {
+    public WellnessActivity_sec33_gr3(LocalDate date, double duration, String notes) {
         this.activityId = nextId++; // gets next available ID and increments counter
         this.date = date;
         this.duration = duration;

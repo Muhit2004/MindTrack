@@ -5,7 +5,7 @@ import java.time.LocalDate;
  * All activities must implement these methods so we can track them properly
  * Makes it easier to work with diferent types of activities
  */
-public interface Trackable {
+public interface Trackable_sec33_gr3 {
 
 
     double getDuration();
@@ -27,5 +27,5 @@ public interface Trackable {
      * Returns true if the activity helps achieve the goal, false otherwise
      * Very usefull for tracking goal completion
      */
-    boolean meetsGoal(WellnessGoal goal);
+    boolean meetsGoal(WellnessGoal_sec33_gr3 goal);
 }

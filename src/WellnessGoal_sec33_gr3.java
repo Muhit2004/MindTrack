@@ -5,10 +5,10 @@ import java.time.LocalDate;
  * Tracks progress towards targets like sleep hours, meditation minutes, etc.
  * Helps users stay motivated and measure there improvement over time
  */
-public class WellnessGoal {
+public class WellnessGoal_sec33_gr3 {
 
     // Goal data fields for tracking progress and targets
-    private String goalType; // what kind of goal this is (from GoalType constants)
+    private String goalType; // what kind of goal this is (from GoalType_sec33_gr3 constants)
     private double targetValue; // the target they want to reach
     private double currentProgress; // how much progress they've made so far
     private LocalDate startDate; // when they started working on this goal
@@ -20,9 +20,9 @@ public class WellnessGoal {
      * Takes all the importent goal details and sets initial progress to zero
      * Goal type should match one of the valid types from GoalType class
      */
-    public WellnessGoal(String goalType, double targetValue, LocalDate startDate,
+    public WellnessGoal_sec33_gr3(String goalType, double targetValue, LocalDate startDate,
                        LocalDate endDate, String description) {
-        if (!GoalType.isValidGoalType(goalType)) {
+        if (!GoalType_sec33_gr3.isValidGoalType(goalType)) {
             throw new IllegalArgumentException("Invalid goal type: " + goalType);
         }
         if (targetValue <= 0) {
@@ -41,7 +41,7 @@ public class WellnessGoal {
 
     /**
      * Gets the type of goal this is
-     * Should match one of the valid goal types from GoalType class
+     * Should match one of the valid goal types from GoalType_sec33_gr3 class
      */
     public String getGoalType() { return goalType; }
 
@@ -112,7 +112,7 @@ public class WellnessGoal {
      * Screen time goals work backwards - lower is better for those
      */
     public boolean isCompleted() {
-        if (goalType.equals(GoalType.SCREEN_TIME_LIMIT)) {
+        if (goalType.equals(GoalType_sec33_gr3.SCREEN_TIME_LIMIT)) {
             return currentProgress <= targetValue; // opposite for screen time
         }
         return currentProgress >= targetValue; // normal goals
@@ -132,28 +132,28 @@ public class WellnessGoal {
      * Different goal types track progress diferently
      * This is where the magic happens for automatic progress tracking
      */
-    public void updateProgressFromActivity(WellnessActivity activity) {
+    public void updateProgressFromActivity(WellnessActivity_sec33_gr3 activity) {
         if (activity == null) return;
 
         // Each goal type updates progress diferently
         switch (goalType) {
-            case GoalType.SLEEP_HOURS:
-                if (activity instanceof Sleep) {
+            case GoalType_sec33_gr3.SLEEP_HOURS:
+                if (activity instanceof Sleep_sec33_gr_3) {
                     currentProgress += activity.getDuration() / 60.0; // convert to hours
                 }
                 break;
-            case GoalType.MEDITATION_MINUTES:
-                if (activity instanceof Meditation) {
+            case GoalType_sec33_gr3.MEDITATION_MINUTES:
+                if (activity instanceof Meditation_sec33_gr3) {
                     currentProgress += activity.getDuration();
                 }
                 break;
-            case GoalType.JOURNAL_ENTRIES:
-                if (activity instanceof Journaling) {
+            case GoalType_sec33_gr3.JOURNAL_ENTRIES:
+                if (activity instanceof Journaling_sec33_gr3) {
                     currentProgress += 1; // one entry = one point
                 }
                 break;
-            case GoalType.SCREEN_TIME_LIMIT:
-                if (activity instanceof ScreenTime) {
+            case GoalType_sec33_gr3.SCREEN_TIME_LIMIT:
+                if (activity instanceof ScreenTime_sec33_gr3) {
                     currentProgress += activity.getDuration(); // total screen time
                 }
                 break;

@@ -3,7 +3,7 @@
  * Uses string constants instead of enum to keep things simple
  * Helps validate goal types and makes sure users dont enter invalid goals
  */
-public class GoalType {
+public class GoalType_sec33_gr3 {
 
     // Goal type constants - these are all the valid goal types users can choose from
 

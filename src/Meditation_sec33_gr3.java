@@ -1,12 +1,11 @@
 import java.time.LocalDate;
-import java.util.Objects;
 
 /**
  * Meditation activity class - tracks meditation sessions and there quality
  * Extends WellnessActivity and implements Trackable interface
  * Helps users monitor mindfulness practice and mediation progress
  */
-public class Meditation extends WellnessActivity implements Trackable {
+public class Meditation_sec33_gr3 extends WellnessActivity_sec33_gr3 implements Trackable_sec33_gr3 {
 
     // Meditation fields for tracking session details
     private String meditationType; // guided, unguided, breathing - what kind of meditation , you can write anythingyou want
@@ -19,7 +18,7 @@ public class Meditation extends WellnessActivity implements Trackable {
      * Takes all the importent meditation details like type and focus area
      * Distraction count helps track how well the session went
      */
-    public Meditation(LocalDate date, double duration, String notes, String meditationType,
+    public Meditation_sec33_gr3(LocalDate date, double duration, String notes, String meditationType,
                       String focusArea, int distractionCount, boolean completedSession) {
         super(date, duration, notes);
         this.meditationType = meditationType;
@@ -80,6 +79,18 @@ public class Meditation extends WellnessActivity implements Trackable {
      */
     public void setCompletedSession(boolean completedSession) { this.completedSession = completedSession; }
 
+    /**
+     * Sets new notes for the activity
+     * Useful for adding or updating session notes later
+     */
+    public void setNotes(String notes) { super.setNotes(notes); }
+
+    /**
+     * Sets a new duration for the activity
+     * Includes validation to ensure the duration is realistic
+     */
+    public void setDuration(double duration) throws InvalidActivityDurationException { super.setDuration(duration); }
+
     // Abstract method implementations - required by parent WellnessActivity class
 
     /**
@@ -132,8 +143,8 @@ public class Meditation extends WellnessActivity implements Trackable {
      * Returns true if session duration meets or exceeds the goal target
      */
     @Override
-    public boolean meetsGoal(WellnessGoal goal) {
-        if (goal.getGoalType() == GoalType.MEDITATION_MINUTES) {
+    public boolean meetsGoal(WellnessGoal_sec33_gr3 goal) {
+        if (goal.getGoalType() == GoalType_sec33_gr3.MEDITATION_MINUTES) {
             return getDuration() >= goal.getTargetValue();
         }
         return false; // wrong goal type or doesnt meet target

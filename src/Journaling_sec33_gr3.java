@@ -1,12 +1,11 @@
 import java.time.LocalDate;
-import java.util.Objects;
 
 /**
  * Journaling activity class - tracks writing sessions and mood changes
  * Extends WellnessActivity and implements Trackable interface
  * Helps users monitor there emotional wellbeing through reflective writing
  */
-public class Journaling extends WellnessActivity_sec33_gr3 implements Trackable_sec33_gr3 {
+public class Journaling_sec33_gr3 extends WellnessActivity_sec33_gr3 implements Trackable_sec33_gr3 {
 
     // Journaling-specific fields for tracking writing sessions and mood impact
     private int moodBefore; // 1-10 scale - how user felt before writing
@@ -20,7 +19,7 @@ public class Journaling extends WellnessActivity_sec33_gr3 implements Trackable_
      * Takes all the importent journaling details like mood changes and theme
      * Word count helps track how much effort they put into writing
      */
-    public Journaling(LocalDate date, double duration, String notes, int moodBefore,
+    public Journaling_sec33_gr3(LocalDate date, double duration, String notes, int moodBefore,
                       int moodAfter, int wordCount, String journalTheme, boolean feltBeneficial) {
         super(date, duration, notes);
         this.moodBefore = moodBefore;
@@ -104,6 +103,18 @@ public class Journaling extends WellnessActivity_sec33_gr3 implements Trackable_
      */
     public void setFeltBeneficial(boolean feltBeneficial) { this.feltBeneficial = feltBeneficial; }
 
+    /**
+     * Sets new notes for the journaling session
+     * Notes can be used to add any additional information or reflections
+     */
+    public void setNotes(String notes) { super.setNotes(notes); }
+
+    /**
+     * Sets a new duration for the journaling session
+     * Duration must be a positive value, 0 or negative values dont make sense
+     */
+    public void setDuration(double duration) throws InvalidActivityDurationException { super.setDuration(duration); }
+
     // Abstract method implementations - required by parent WellnessActivity class
 
     /**
@@ -160,7 +171,7 @@ public class Journaling extends WellnessActivity_sec33_gr3 implements Trackable_
      */
     @Override
     public boolean meetsGoal(WellnessGoal_sec33_gr3 goal) {
-        if (goal.getGoalType() == GoalType.MOOD_IMPROVEMENT) {
+        if (goal.getGoalType() == GoalType_sec33_gr3.MOOD_IMPROVEMENT) {
             return (moodAfter - moodBefore) >= goal.getTargetValue();
         }
         return false; // wrong goal type or doesnt meet target

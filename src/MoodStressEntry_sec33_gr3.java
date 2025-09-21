@@ -5,7 +5,7 @@ import java.time.LocalDate;
  * Helps monitor emotional wellbeing and identify patterns over time
  * Important for understanding how activities affect there mental state
  */
-public class MoodStressEntry {
+public class MoodStressEntry_sec33_gr3 {
 
     // Fields for tracking mood and stress data
     private LocalDate date; // when this mood/stress reading was taken
@@ -20,7 +20,7 @@ public class MoodStressEntry {
      * Validates mood and stress values to make sure they're in valid range
      * Tags and notes are optional but can provide usefull context
      */
-    public MoodStressEntry(LocalDate date, int moodLevel, int stressLevel,
+    public MoodStressEntry_sec33_gr3(LocalDate date, int moodLevel, int stressLevel,
                           String moodTags, String stressTriggers, String notes) {
         if (moodLevel < 1 || moodLevel > 10) {
             throw new InvalidMoodStressValueException("Mood level must be between 1 and 10");
