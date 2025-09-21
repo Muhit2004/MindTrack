@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Main_sec33_gr3 {
     //just one sessions
-    private static User currentUser;
+    private static User_sec33_gr_3 currentUser;
     private static final Scanner scanner = new Scanner(System.in);
 
     /**
@@ -18,7 +18,7 @@ public class Main_sec33_gr3 {
         System.out.print("Please enter your name to begin: ");
         String name = scanner.nextLine().trim();
         if (name.isEmpty()) name = "Guest";
-        currentUser = new User(name);
+        currentUser = new User_sec33_gr_3(name);
         System.out.println("Hello, " + currentUser.getName() + "! Let's take care of your wellness.\n");
 
         boolean running = true;
@@ -87,7 +87,7 @@ public class Main_sec33_gr3 {
     /**
      * Option 1 - Let user log a new wellness activity
      * Shows submenu for Sleep, Meditation, Journaling, or ScreenTime
-     * Gets all the details and saves it to the user's activity list -check User.java for how the data structure works.
+     * Gets all the details and saves it to the user's activity list -check User_sec33_gr_3.java for how the data structure works.
      */
     // Option 1: Log New Activity — includes submenu for activity types.
     private static void logNewActivity() {
@@ -115,7 +115,7 @@ public class Main_sec33_gr3 {
                     Sleep_sec33_gr_3 sleep = new Sleep_sec33_gr_3(date, sleepMinutes, notes, quality, bedtime, wake, nightmares); //object
 
                     if (!sleep.isValidDuration(sleepMinutes)) {
-                        throw new InvalidActivityDurationException("Invalid duration for Sleep: " + sleepMinutes);
+                        throw new InvalidActivityDurationException_sec33_gr_3("Invalid duration for Sleep: " + sleepMinutes);
                     }
                     currentUser.addActivity(sleep); //adds to the user's list of activities
                     System.out.println("Added: " + sleep);
@@ -131,7 +131,7 @@ public class Main_sec33_gr3 {
 
                     Meditation_sec33_gr3 meditation = new Meditation_sec33_gr3(date, medMinutes, notes, medType, focus, distractions, completed);
                     if (!meditation.isValidDuration(medMinutes)) {
-                        throw new InvalidActivityDurationException("Invalid duration for Meditation: " + medMinutes);
+                        throw new InvalidActivityDurationException_sec33_gr_3("Invalid duration for Meditation: " + medMinutes);
                     }
                     currentUser.addActivity(meditation);
                     System.out.println("Added: " + meditation);
@@ -149,7 +149,7 @@ public class Main_sec33_gr3 {
 
                     Journaling_sec33_gr3 journaling = new Journaling_sec33_gr3(date, jrnlMinutes, notes, moodBefore, moodAfter, words, theme, beneficial);
                     if (!journaling.isValidDuration(jrnlMinutes)) {
-                        throw new InvalidActivityDurationException("Invalid duration for Journaling: " + jrnlMinutes);
+                        throw new InvalidActivityDurationException_sec33_gr_3("Invalid duration for Journaling: " + jrnlMinutes);
                     }
                     currentUser.addActivity(journaling);
                     System.out.println("Added: " + journaling);
@@ -165,14 +165,14 @@ public class Main_sec33_gr3 {
 
                     ScreenTime_sec33_gr3 screenTime = new ScreenTime_sec33_gr3(date, stMinutes, notes, device, purpose, breaks, eyeStrain);
                     if (!screenTime.isValidDuration(stMinutes)) {
-                        throw new InvalidActivityDurationException("Invalid duration for ScreenTime: " + stMinutes);
+                        throw new InvalidActivityDurationException_sec33_gr_3("Invalid duration for ScreenTime: " + stMinutes);
                     }
                     currentUser.addActivity(screenTime);
                     System.out.println("Added: " + screenTime);
                     System.out.println(screenTime.getProgress());
                     break;
             }
-        } catch (InvalidActivityDurationException ex) {
+        } catch (InvalidActivityDurationException_sec33_gr_3 ex) {
             System.out.println("Error: " + ex.getMessage());
         } catch (Exception ex) {
             System.out.println("An error occurred while logging activity: " + ex.getMessage());
@@ -221,7 +221,7 @@ public class Main_sec33_gr3 {
                             if (dur > 0 && sleep.isValidDuration(dur)) {
                                 try {
                                     sleep.setDuration(dur);
-                                } catch (InvalidActivityDurationException e) {
+                                } catch (InvalidActivityDurationException_sec33_gr_3 e) {
                                     System.out.println("Error updating duration: " + e.getMessage());
                                 }
                             }
@@ -270,7 +270,7 @@ public class Main_sec33_gr3 {
                             if (dur > 0 && meditation.isValidDuration(dur)) {
                                 try {
                                     meditation.setDuration(dur);
-                                } catch (InvalidActivityDurationException e) {
+                                } catch (InvalidActivityDurationException_sec33_gr_3 e) {
                                     System.out.println("Error updating duration: " + e.getMessage());
                                 }
                             }
@@ -320,7 +320,7 @@ public class Main_sec33_gr3 {
                             if (dur > 0 && journaling.isValidDuration(dur)) {
                                 try {
                                     journaling.setDuration(dur);
-                                } catch (InvalidActivityDurationException e) {
+                                } catch (InvalidActivityDurationException_sec33_gr_3 e) {
                                     System.out.println("Error updating duration: " + e.getMessage());
                                 }
                             }
@@ -373,7 +373,7 @@ public class Main_sec33_gr3 {
                             if (dur > 0 && screenTime.isValidDuration(dur)) {
                                 try {
                                     screenTime.setDuration(dur);
-                                } catch (InvalidActivityDurationException e) {
+                                } catch (InvalidActivityDurationException_sec33_gr_3 e) {
                                     System.out.println("Error updating duration: " + e.getMessage());
                                 }
                             }

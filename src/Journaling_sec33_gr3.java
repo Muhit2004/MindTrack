@@ -113,7 +113,7 @@ public class Journaling_sec33_gr3 extends WellnessActivity_sec33_gr3 implements 
      * Sets a new duration for the journaling session
      * Duration must be a positive value, 0 or negative values dont make sense
      */
-    public void setDuration(double duration) throws InvalidActivityDurationException { super.setDuration(duration); }
+    public void setDuration(double duration) throws InvalidActivityDurationException_sec33_gr_3 { super.setDuration(duration); }
 
     // Abstract method implementations - required by parent WellnessActivity class
 

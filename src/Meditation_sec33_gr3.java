@@ -89,7 +89,7 @@ public class Meditation_sec33_gr3 extends WellnessActivity_sec33_gr3 implements 
      * Sets a new duration for the activity
      * Includes validation to ensure the duration is realistic
      */
-    public void setDuration(double duration) throws InvalidActivityDurationException { super.setDuration(duration); }
+    public void setDuration(double duration) throws InvalidActivityDurationException_sec33_gr_3 { super.setDuration(duration); }
 
     // Abstract method implementations - required by parent WellnessActivity class
 

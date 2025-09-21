@@ -7,7 +7,7 @@ import java.util.List;
  * Stores all the user's activities, mood entries, and wellness goals in memory
  * Acts as the main data container for everything related to one user's journy
  */
-public class User {
+public class User_sec33_gr_3 {
 
     // User profile information and data storage
     private String name; // user's display name
@@ -21,7 +21,7 @@ public class User {
      * Sets up empty lists for storing user data and records join date
      * Name is required but we dont validate it much - users can use any name they want
      */
-    public User(String name) {
+    public User_sec33_gr_3(String name) {
         this.name = name;
         this.joinDate = LocalDate.now(); // automatically set to today
         this.moodStressEntries = new ArrayList<>();

@@ -102,7 +102,7 @@ import java.time.LocalDate;
      * Sets a new duration for the screen time activity
      * Duration must be valid according to the isValidDuration method
      */
-    public void setDuration(double duration) throws InvalidActivityDurationException { super.setDuration(duration); }
+    public void setDuration(double duration) throws InvalidActivityDurationException_sec33_gr_3 { super.setDuration(duration); }
 
     // Abstract method implementations - required by parent WellnessActivity class
 

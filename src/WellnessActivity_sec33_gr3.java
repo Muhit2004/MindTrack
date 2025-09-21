@@ -67,9 +67,9 @@ public abstract class WellnessActivity_sec33_gr3 {
      * Throws exception if duration is invalid for this activity type
      * Each activity type has there own rules about valid durations
      */
-    public void setDuration(double duration) throws InvalidActivityDurationException {
+    public void setDuration(double duration) throws InvalidActivityDurationException_sec33_gr_3 {
         if (!isValidDuration(duration)) {
-            throw new InvalidActivityDurationException("Invalid duration: " + duration + " minutes");
+            throw new InvalidActivityDurationException_sec33_gr_3("Invalid duration: " + duration + " minutes");
         }
         this.duration = duration;
     }
