@@ -23,5 +23,5 @@ public class InvalidActivityDurationException_sec33_gr_3 extends Exception {
         super(message, cause);
     }
  
-    public static 
+
 }

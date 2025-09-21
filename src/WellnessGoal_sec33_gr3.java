@@ -127,38 +127,7 @@ public class WellnessGoal_sec33_gr3 {
         return (currentProgress / targetValue) * 100;
     }
 
-    /**
-     * Updates progress based on a new activity
-     * Different goal types track progress diferently
-     * This is where the magic happens for automatic progress tracking
-     */
-    public void updateProgressFromActivity(WellnessActivity_sec33_gr3 activity) {
-        if (activity == null) return;
 
-        // Each goal type updates progress diferently
-        switch (goalType) {
-            case GoalType_sec33_gr3.SLEEP_HOURS:
-                if (activity instanceof Sleep_sec33_gr_3) {
-                    currentProgress += activity.getDuration() / 60.0; // convert to hours
-                }
-                break;
-            case GoalType_sec33_gr3.MEDITATION_MINUTES:
-                if (activity instanceof Meditation_sec33_gr3) {
-                    currentProgress += activity.getDuration();
-                }
-                break;
-            case GoalType_sec33_gr3.JOURNAL_ENTRIES:
-                if (activity instanceof Journaling_sec33_gr3) {
-                    currentProgress += 1; // one entry = one point
-                }
-                break;
-            case GoalType_sec33_gr3.SCREEN_TIME_LIMIT:
-                if (activity instanceof ScreenTime_sec33_gr3) {
-                    currentProgress += activity.getDuration(); // total screen time
-                }
-                break;
-        }
-    }
 
     /**
      * Creates a nice string representation of the goal

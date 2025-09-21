@@ -1,6 +1,7 @@
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main_sec33_gr3 {
@@ -48,9 +49,12 @@ public class Main_sec33_gr3 {
                     removeActivity();
                     break;
                 case 8:
-                    innovativeFeature();
+                    duplicateRecentActivity();
                     break;
                 case 9:
+                    weeklyChallenges();
+                    break;
+                case 10:
                     System.out.println("Thank you for using MindTrack. Stay healthy and mindful!");
                     running = false;
                     break;
@@ -79,8 +83,9 @@ public class Main_sec33_gr3 {
         System.out.println("5. View Wellness Progress");
         System.out.println("6. Generate Wellness Reports");
         System.out.println("7. Remove Activity");
-        System.out.println("8. [Your innovative feature]");
-        System.out.println("9. Exit");
+        System.out.println("8. Duplicate Recent Activity (Bonus)");
+        System.out.println("9. Weekly challenge (Bonus)");
+        System.out.println("10. Exit");
         System.out.println("------------------------------------------------------------");
     }
 
@@ -624,6 +629,7 @@ public class Main_sec33_gr3 {
 
     /**
      remove activity option , chack user to understand
+     *EXRTA FEATURE
     */
     private static void removeActivity() {
 
@@ -651,10 +657,94 @@ public class Main_sec33_gr3 {
   add a new features
      */
 
-    private static void innovativeFeature() {
-        System.out.println("-- Quick Calm Breathing Coach --");
-        System.out.println("Try 4-4-6 breathing for 1 minute: Inhale 4s, Hold 4s, Exhale 6s. You got this!");
+    //done by tarek
+    //bonus task
+
+    /*
+    *Checks if there is any activities that are done first then gives u option to clone the recent 5 activities
+     */
+    private static void duplicateRecentActivity() {
+        if (currentUser.getActivities().isEmpty()) {
+            System.out.println(" No activities to duplicate.");
+            return;
+        }
+
+        // Show last 5 activities (or fewer if less than 5)
+        int total = currentUser.getActivities().size();
+        int start = Math.max(0, total - 5);
+
+        System.out.println("-- Recent Activities --");
+        for (int i = start; i < total; i++) {
+            System.out.println((i - start + 1) + ". " + currentUser.getActivities().get(i));
+        }
+
+        int choice = readInt("Pick an activity to duplicate (1-" + (total - start) + "): ", 1, total - start);
+        WellnessActivity_sec33_gr3 selected = currentUser.getActivities().get(start + choice - 1);
+
+        // Now clone the selected activity using instanceof
+        WellnessActivity_sec33_gr3 copy = null;
+        if (selected instanceof Sleep_sec33_gr_3 sleep) {
+            copy = new Sleep_sec33_gr_3(sleep.getDate(), sleep.getDuration(), sleep.getNotes(),
+                    sleep.getQuality(), sleep.getBedtime(), sleep.getWakeTime(), sleep.hadNightmares());
+        }
+        else if (selected instanceof Meditation_sec33_gr3 med) {
+            copy = new Meditation_sec33_gr3(med.getDate(), med.getDuration(), med.getNotes(),
+                    med.getMeditationType(), med.getFocusArea(), med.getDistractionCount(), med.isCompletedSession());
+        }
+        else if (selected instanceof Journaling_sec33_gr3 jrnl) {
+            copy = new Journaling_sec33_gr3(jrnl.getDate(), jrnl.getDuration(), jrnl.getNotes(),
+                    jrnl.getMoodBefore(), jrnl.getMoodAfter(), jrnl.getWordCount(), jrnl.getJournalTheme(), jrnl.feltBeneficial());
+        }
+        else if (selected instanceof ScreenTime_sec33_gr3 st) {
+            copy = new ScreenTime_sec33_gr3(st.getDate(), st.getDuration(), st.getNotes(),
+                    st.getDeviceType(), st.getPurpose(), st.getBreaksTaken(), st.causedEyeStrain());
+        }
+
+        if (copy != null) {
+            currentUser.addActivity(copy);
+            System.out.println("Duplicated activity: " + copy);
+        } else {
+            System.out.println(" Error duplicating activity.");
+        }
     }
+
+
+    //Done by fakhri
+    /*
+    *this method will generate random challenges for the user to do throughout the weekend
+    *bonus task
+     */
+    private static void weeklyChallenges() {
+        System.out.println(" Weekly Challenges ");
+
+//this array contains the possible challenges that might happen
+
+        String[] Challenges = {
+                "Meditate for at least 10 mins every day for a whole week",
+                "Take a walk for 10 mins every day for 3 days",
+                "Sleep for atleast 8 hours every day this week",
+                "Little usage of screen time",
+                "3 mins of deep breathing in the weekend"
+        };
+
+// this is used to randomly choose of the challenges from the array
+
+        Random rand = new Random();
+        String challenges = Challenges[rand.nextInt(Challenges.length)];
+
+// we use this to display the challenge
+
+        System.out.println(" Your challenge for this week is: ");
+        System.out.println(challenges);
+
+        boolean completed = readYesNo("Did you complete this weeks challenge? (y/n):");
+
+        System.out.println(completed ? "Congrats on finishing this week's challenge" :
+                "No worries theres another challenge this week");
+
+
+    }
+
 
     // =====================
     // Input helper methods
