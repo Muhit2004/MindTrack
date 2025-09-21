@@ -6,7 +6,7 @@ import java.util.Objects;
  * Extends WellnessActivity and implements Trackable interface
  * Helps users monitor there emotional wellbeing through reflective writing
  */
-public class Journaling extends WellnessActivity implements Trackable {
+public class Journaling extends WellnessActivity_sec33_gr3 implements Trackable_sec33_gr3 {
 
     // Journaling-specific fields for tracking writing sessions and mood impact
     private int moodBefore; // 1-10 scale - how user felt before writing
@@ -159,7 +159,7 @@ public class Journaling extends WellnessActivity implements Trackable {
      * Returns true if mood increased enough to meet the goal target
      */
     @Override
-    public boolean meetsGoal(WellnessGoal goal) {
+    public boolean meetsGoal(WellnessGoal_sec33_gr3 goal) {
         if (goal.getGoalType() == GoalType.MOOD_IMPROVEMENT) {
             return (moodAfter - moodBefore) >= goal.getTargetValue();
         }
