@@ -25,7 +25,7 @@ public class Main_sec33_gr3 {
         boolean running = true;
         while (running) {
             displayMainMenu();
-            int choice = readInt("Choose an option (1-8): ", 1, 9);
+            int choice = readInt("Choose an option (1-10): ", 1,10);
             switch (choice) {
                 case 1:
                     logNewActivity();
